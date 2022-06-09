@@ -1,18 +1,18 @@
 import process, { stdout, stdin, argv, env } from 'process';
-import { homedir } from 'os';
 
-import { commandHandler } from './commandHandler.js';
-import { exit } from './exit.js';
+import commandHandler from './commandHandler.js';
+import exit from './exit.js';
+import goToHomeDirr from './goToHomeDirr.js';
+import youAreCurrentlyIn from './youAreCurrentlyIn.js';
 
 const init = () => {
   const userName = argv[2].replace('--username=', '');
 
-  stdout.write(`Welcome to the File Manager, ${userName}!\n\n`);
+  stdout.write(`Welcome to the File Manager, ${userName}!\n`);
 
-  // const homedir = homedir();
+  goToHomeDirr();
 
-  // stdout.write(Object..join(', '))
-  console.log(env);
+  youAreCurrentlyIn();
 
   stdin.on('data', commandHandler);
 
