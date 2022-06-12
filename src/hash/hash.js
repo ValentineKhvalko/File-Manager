@@ -1,14 +1,21 @@
 import { createHash } from 'crypto';
-import { readFile } from 'fs/promises';
+import { createReadStream } from 'fs';
 import { resolve } from 'path';
 
-const hash = async (path) => {  
-	const fileBuffer = await readFile(resolve(path));
-  const hashSum = createHash('sha256');
-  hashSum.update(fileBuffer);
-  const hex = hashSum.digest('hex');
+const hash = async ({path, onEnd, onError}) => {  
+  const readStream = createReadStream(resolve(path));
 
-  return hex;
+  const hashSum = createHash('sha256');
+  hashSum.setEncoding('hex');
+
+  readStream.on('end', () => {
+    hashSum.end()
+    onEnd(hashSum.read());
+  });
+
+  readStream.on('error', onError);
+
+  readStream.pipe(hashSum);
 };
 
 export default hash;

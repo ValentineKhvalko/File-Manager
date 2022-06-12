@@ -1,26 +1,21 @@
 import { createReadStream, createWriteStream } from 'fs';
 import { resolve, basename } from 'path';
+import { pipeline } from 'stream';
 
-const cp = async (props) => {
+const cp = ({props, onEnd, onError}) => {
   const [pathToFile, pathToNewDir] = props.split(' ');
 
   const absolutePathToFile = resolve(pathToFile);
   const absolutePathToNewDir = resolve(pathToNewDir);
   const fileName = basename(absolutePathToFile);
 
-	const readStream = createReadStream(pathToFile);
+	const readStream = createReadStream(absolutePathToFile);
   const writeStream = createWriteStream(`${absolutePathToNewDir}\\${fileName}`);
 
-  const stream = readStream.pipe(writeStream);
-
-  const promise = new Promise((resolve, reject) => {
-    stream.on('finish', resolve);
-
-    readStream.on('error', reject);
-    writeStream.on('error', reject);
+  pipeline(readStream, writeStream, (err) => {
+    if(err) onError()
+    else onEnd()
   })
-
-  return promise;
 };
 
 export default cp;

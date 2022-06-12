@@ -1,8 +1,9 @@
 import { createBrotliCompress } from 'zlib';
 import { resolve, basename } from 'path';
 import { createReadStream, createWriteStream } from 'fs';
+import { pipeline } from 'stream';
 
-const compress = async (props) => {
+const compress = async ({props, onEnd, onError}) => {
   const [pathToFile, pathToNewDir] = props.split(' ');
 
   const absolutePathToFile = resolve(pathToFile);
@@ -13,17 +14,10 @@ const compress = async (props) => {
   const brotliCompress = createBrotliCompress();
   const writeStream = createWriteStream(`${absolutePathToNewDir}\\${fileName}.br`);
 
-  const stream = readStream.pipe(brotliCompress).pipe(writeStream);
-
-  const promise = new Promise((resolve, reject) => {
-    stream.on('finish', resolve);
-
-    readStream.on('error', reject);
-    writeStream.on('error', reject);
-    brotliCompress.on('error', reject);
+  pipeline(readStream, brotliCompress, writeStream, (err) => {
+    if(err) onError()
+    else onEnd()
   })
-
-  return promise;
 }
 
 export default compress;

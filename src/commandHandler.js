@@ -24,8 +24,12 @@ import commandOsHandler from './os/commandOsHandler.js';
 import youAreCurrentlyIn from './utils/youAreCurrentlyIn.js';
 import { checkIsValidCommand, checkIsValidProps } from "./utils/utils.js";
 
-const commandHandler = async (data) => {
+const onEnd = youAreCurrentlyIn;
+const onError = () => {
+  stdout.write(`${EOL}Operation failed${EOL}${EOL}`);
+}
 
+const commandHandler = async (data) => {
   try {
     const input = data.toString().trim();
 
@@ -74,15 +78,16 @@ const commandHandler = async (data) => {
         break;
       
       case 'hash': 
-        const fileHash = await hash(props);
-        stdout.write(fileHash);
+        hash({path: props, onEnd: (hash) => {
+          stdout.write(hash);
+          onEnd();
+        }, onError});
 
-        break;
+        return;
 
       case 'cat': 
-        await cat(props);
-
-        break;
+        cat({path: props, onEnd, onError});
+        return;
       
       case 'add':
         await add(props);
@@ -103,33 +108,41 @@ const commandHandler = async (data) => {
         break;
 
       case 'cp': 
-        await cp(props);
-        stdout.write(`${EOL}File successfully copied`);
+        cp({props, onEnd: () => {
+          stdout.write(`${EOL}File successfully copied`);
+          onEnd();
+        }, onError});
 
-        break;
+        return;
       
       case 'mv':
-        await mv(props);
-        stdout.write(`${EOL}File successfully moved`);
+        mv({props, onEnd: () => {
+          stdout.write(`${EOL}File successfully moved`);
+          onEnd();
+        }, onError});
 
-        break;
+        return;
 
       case 'compress': 
-        await compress(props)
-        stdout.write(`${EOL}File successfully compressed`);
+        compress({props, onEnd: () => {
+          stdout.write(`${EOL}File successfully compressed`);
+          onEnd();
+        }, onError})
 
-        break;
+        return;
 
       case 'decompress': 
-        await decompress(props)
-        stdout.write(`${EOL}File successfully decompressed`);
+        decompress({props, onEnd: () => {
+          stdout.write(`${EOL}File successfully decompressed`);
+          onEnd();
+        }, onError})
 
-        break;
+        return;
     }   
 
-    youAreCurrentlyIn();
+    onEnd();
   } catch {
-    stdout.write(`${EOL}Operation failed${EOL}${EOL}`);
+    onError();
   }
 }
 

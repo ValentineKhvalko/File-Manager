@@ -1,8 +1,9 @@
 import { createBrotliDecompress } from 'zlib';
 import { resolve, basename } from 'path';
 import { createReadStream, createWriteStream } from 'fs';
+import { pipeline } from 'stream';
 
-const decompress = async (props) => {
+const decompress = async ({props, onEnd, onError}) => {
   const [pathToFile, pathToNewDir] = props.split(' ');
 
   const absolutePathToFile = resolve(pathToFile);
@@ -13,17 +14,10 @@ const decompress = async (props) => {
   const brotliDecompress = createBrotliDecompress();
   const writeStream = createWriteStream(`${absolutePathToNewDir}\\${fileName}`);
 
-  const stream = readStream.pipe(brotliDecompress).pipe(writeStream);
-
-  const promise = new Promise((resolve, reject) => {
-    stream.on('finish', resolve);
-
-    readStream.on('error', reject);
-    writeStream.on('error', reject);
-    brotliDecompress.on('error', reject);
-  })
-
-  return promise;
+  pipeline(readStream, brotliDecompress, writeStream, (err) => {
+    if(err) onError()
+    else onEnd()
+  });
 }
 
 export default decompress;
