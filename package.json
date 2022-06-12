@@ -1,0 +1,16 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node ./src/init.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ValentineKhvalko/File-Manager.git"
+  },
+  "keywords": ["nodejs", "assignments", "alreadybored"],
+  "author": "alreadybored",
+  "license": "ISC",
+  "homepage": "https://github.com/ValentineKhvalko/File-Manager#readme"
+}
