@@ -1,10 +1,17 @@
 import { stdout } from 'process';
+import { EOL } from 'os';
 
 import exit from "./exit.js";
+
+import cat from './files/cat.js';
+import add from './files/add.js';
+import rm from './files/rm.js';
 
 import cd from './nwd/cd.js';
 import up from './nwd/up.js';
 import ls from './nwd/ls.js';
+
+import hash from './hash/hash.js';
 
 import commandOsHandler from './os/commandOsHandler.js';
 
@@ -21,15 +28,13 @@ const commandHandler = async (data) => {
       return;
     }
 
-    const splitedInput = input.split(' ');
-
-    const command = splitedInput[0];
-    const props = splitedInput[1];
+    const [command, ...propsArray] = input.split(' ');
+    const props = propsArray.join(' ');
 
     const isValidCommand = checkIsValidCommand(command);
 
     if(!isValidCommand) {
-      stdout.write('\nInvalid input\n\n');
+      stdout.write(`${EOL}Invalid input${EOL}`);
       return;
     }
 
@@ -47,14 +52,39 @@ const commandHandler = async (data) => {
         break;
       
       case 'os':
-        stdout.write(commandOsHandler(props));
+        const output = commandOsHandler(props);
+
+        if(output === 'failed') {
+          stdout.write(`${EOL}Invalid input${EOL}`);
+          return;
+        }
+
+        stdout.write(output);
+        break;
+      
+      case 'hash': 
+        const fileHash = await hash(props);
+        stdout.write(fileHash);
         break;
 
-    } 
+      case 'cat': 
+        cat(props).pipe(stdout);
+        break;
+      
+      case 'add':
+        await add(props);
+        stdout.write(`${EOL}File successfully added`);
+        break;
+      
+      case 'rm': 
+        await rm(props);
+        stdout.write(`${EOL}File successfully removed`);
+        break;
+    }   
 
     youAreCurrentlyIn();
   } catch {
-    stdout.write('\nOperation failed\n\n');
+    stdout.write(`${EOL}Operation failed${EOL}${EOL}`);
   }
 }
 

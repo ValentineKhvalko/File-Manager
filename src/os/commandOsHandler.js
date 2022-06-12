@@ -1,4 +1,6 @@
 import { env } from 'process';
+import { cpus, EOL, arch } from 'os';
+import { formatCPUSData } from '../utils.js';
 
 const commandOsHandler = (command) => {
   if(command === '--homedir') {
@@ -10,18 +12,18 @@ const commandOsHandler = (command) => {
   }
 
   if(command === '--EOL') {
-    return 
+    return JSON.stringify(EOL);
   }
 
   if(command === '--cpus') {
-    return 
+    return formatCPUSData(cpus());
   }
 
   if(command === '--architecture') {
-    return 
+    return arch();
   }
 
-  return '\nInvalid input\n\n';
+  return 'failed';
 }
 
 export default commandOsHandler;
