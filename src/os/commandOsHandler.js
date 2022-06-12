@@ -1,6 +1,6 @@
 import { env } from 'process';
 import { cpus, EOL, arch } from 'os';
-import { formatCPUSData } from '../utils.js';
+import { formatCPUSData } from '../utils/utils.js';
 
 const commandOsHandler = (command) => {
   if(command === '--homedir') {

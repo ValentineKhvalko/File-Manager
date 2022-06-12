@@ -1,1 +1,0 @@
-export const VALID_COMMANDS = ['up', 'ls', 'os', 'cd', 'cat', 'add', 'rn', 'cp', 'mv', 'rm', 'hash', 'compress', 'decompress '];

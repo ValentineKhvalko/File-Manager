@@ -1,5 +1,5 @@
-import cd from "./nwd/cd.js"
-import commandOsHandler from "./os/commandOsHandler.js"
+import cd from "../nwd/cd.js"
+import commandOsHandler from "../os/commandOsHandler.js"
 
 const goToHomeDirr = () => {
   const userHomeDirr = commandOsHandler('--homedir');
